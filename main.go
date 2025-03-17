@@ -25,27 +25,32 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{"message": "received push event"})
 
-		gitCmd := exec.Command("git", "pull")
-		gitCmd.Dir = "/root/blog"
-		err := gitCmd.Run()
-		if err != nil {
-			log.Println("Failed to pull", err)
-			return
-		}
+		go func() {
 
-		buildCmd := exec.Command("yarn", "build")
-		buildCmd.Dir = "/root/blog"
-		err = buildCmd.Run()
-		if err != nil {
-			log.Println("Failed to build", err)
-			return
-		}
+			gitCmd := exec.Command("git", "pull")
+			gitCmd.Dir = "/root/blog"
+			err := gitCmd.Run()
+			if err != nil {
+				log.Println("Failed to pull", err)
+				return
+			}
 
-		err = exec.Command("pm2", "restart", "blog").Start()
-		if err != nil {
-			log.Println("Failed to restart", err)
-			return
-		}
+			buildCmd := exec.Command("yarn", "build")
+			buildCmd.Dir = "/root/blog"
+			err = buildCmd.Run()
+			if err != nil {
+				log.Println("Failed to build", err)
+				return
+			}
+
+			err = exec.Command("pm2", "restart", "blog").Start()
+			if err != nil {
+				log.Println("Failed to restart", err)
+				return
+			}
+
+			log.Println("Deployed successfully")
+		}()
 	})
 
 	router.Run(":5000")
