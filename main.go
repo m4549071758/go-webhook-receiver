@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os/exec"
 
@@ -22,11 +23,13 @@ func main() {
 			return
 		}
 
+		c.JSON(http.StatusOK, gin.H{"message": "received push event"})
+
 		gitCmd := exec.Command("git", "pull")
 		gitCmd.Dir = "/root/blog"
 		err := gitCmd.Run()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to pull from git", "details": err.Error()})
+			log.Println("Failed to pull", err)
 			return
 		}
 
@@ -34,17 +37,15 @@ func main() {
 		buildCmd.Dir = "/root/blog"
 		err = buildCmd.Run()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to build", "details": err.Error()})
+			log.Println("Failed to build", err)
 			return
 		}
 
 		err = exec.Command("pm2", "restart", "blog").Start()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to start", "details": err.Error()})
+			log.Println("Failed to restart", err)
 			return
 		}
-
-		c.JSON(http.StatusOK, gin.H{"message": "received push event"})
 	})
 
 	router.Run(":5000")
