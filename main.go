@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -47,8 +48,9 @@ func main() {
 				return
 			}
 			log.Println("Built latest code")
-
 			log.Println("Restarting the server")
+			// 10秒待つ
+			time.Sleep(10 * time.Second)
 			err = exec.Command("pm2", "restart", "blog").Start()
 			if err != nil {
 				log.Println("Failed to restart", err)
