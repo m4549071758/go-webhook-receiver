@@ -48,10 +48,9 @@ func main() {
 				return
 			}
 			log.Println("Built latest code")
-			log.Println("Restarting the server")
-			// 10秒待つ
 			time.Sleep(10 * time.Second)
-			err = exec.Command("pm2", "restart", "blog").Start()
+			log.Println("Restarting the server")
+			err = exec.Command("pm2", "restart", "blog").Run()
 			if err != nil {
 				log.Println("Failed to restart", err)
 				return
