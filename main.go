@@ -27,6 +27,8 @@ func main() {
 
 		go func() {
 
+			log.Println("Received push event")
+			log.Println("Pulling latest code from GitHub")
 			gitCmd := exec.Command("git", "pull")
 			gitCmd.Dir = "/root/blog"
 			err := gitCmd.Run()
@@ -34,7 +36,9 @@ func main() {
 				log.Println("Failed to pull", err)
 				return
 			}
+			log.Println("Pulled latest code")
 
+			log.Println("Initiating build process")
 			buildCmd := exec.Command("yarn", "build")
 			buildCmd.Dir = "/root/blog"
 			err = buildCmd.Run()
@@ -42,12 +46,15 @@ func main() {
 				log.Println("Failed to build", err)
 				return
 			}
+			log.Println("Built latest code")
 
+			log.Println("Restarting the server")
 			err = exec.Command("pm2", "restart", "blog").Start()
 			if err != nil {
 				log.Println("Failed to restart", err)
 				return
 			}
+			log.Println("Restarted the server")
 
 			log.Println("Deployed successfully")
 		}()
