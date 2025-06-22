@@ -49,13 +49,49 @@ func main() {
 			}
 			log.Println("Built latest code")
 			time.Sleep(10 * time.Second)
-			log.Println("Restarting the server")
-			err = exec.Command("pm2", "restart", "blog").Run()
+
+			log.Println("Stopping the server")
+			pm2StopCmd := exec.Command("pm2", "delete", "blog")
+			pm2StopCmd.Dir = "/root/blog"
+			err = pm2StopCmd.Run()
 			if err != nil {
-				log.Println("Failed to restart", err)
+				log.Println("Failed to stop", err)
 				return
 			}
-			log.Println("Restarted the server")
+			log.Println("Stopped the server")
+			time.Sleep(5 * time.Second)
+
+			log.Println("Fetching articles for sitemap")
+			sitemapCmd := exec.Command("npm", "run", "fetch-articles")
+			sitemapCmd.Dir = "/root/blog"
+			err = sitemapCmd.Run()
+			if err != nil {
+				log.Println("Failed to fetch articles for sitemap", err)
+				return
+			}
+			log.Println("Got articles for sitemap")
+			time.Sleep(5 * time.Second)
+
+			log.Println("Generating sitemap")
+			sitemapGenCmd := exec.Command("npm", "run", "generate-static-files")
+			sitemapGenCmd.Dir = "/root/blog"
+			err = sitemapGenCmd.Run()
+			if err != nil {
+				log.Println("Failed to generate sitemap", err)
+				return
+			}
+			log.Println("Generated sitemap")
+			time.Sleep(5 * time.Second)
+
+			log.Println("Starting the server")
+			pm2Cmd := exec.Command("pm2", "start", "ecosystem.config.js")
+			pm2Cmd.Dir = "/root/blog"
+			err = pm2Cmd.Run()
+			if err != nil {
+				log.Println("Failed to start", err)
+				return
+			}
+			log.Println("Started the server")
 
 			log.Println("Deployed successfully")
 		}()
