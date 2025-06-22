@@ -82,40 +82,6 @@ func main() {
 			time.Sleep(5 * time.Second)
 
 			log.Println("----------------------------------------")
-			log.Println("STARTING: Fetching articles for sitemap")
-			log.Println("----------------------------------------")
-			sitemapCmd := exec.Command("npm", "run", "fetch-articles")
-			sitemapCmd.Dir = "/root/blog"
-			sitemapCmd.Stdout = log.Writer()
-			sitemapCmd.Stderr = log.Writer()
-			err = sitemapCmd.Run()
-			if err != nil {
-				log.Println("Failed to fetch articles for sitemap", err)
-				return
-			}
-			log.Println("----------------------------------------")
-			log.Println("FINISHED: Got articles for sitemap")
-			log.Println("----------------------------------------")
-			time.Sleep(5 * time.Second)
-
-			log.Println("----------------------------------------")
-			log.Println("STARTING: Generating sitemap")
-			log.Println("----------------------------------------")
-			sitemapGenCmd := exec.Command("npm", "run", "generate-static-files")
-			sitemapGenCmd.Dir = "/root/blog"
-			sitemapGenCmd.Stdout = log.Writer()
-			sitemapGenCmd.Stderr = log.Writer()
-			err = sitemapGenCmd.Run()
-			if err != nil {
-				log.Println("Failed to generate sitemap", err)
-				return
-			}
-			log.Println("----------------------------------------")
-			log.Println("FINISHED: Generated sitemap")
-			log.Println("----------------------------------------")
-			time.Sleep(5 * time.Second)
-
-			log.Println("----------------------------------------")
 			log.Println("STARTING: Starting the server")
 			log.Println("----------------------------------------")
 			pm2Cmd := exec.Command("pm2", "start", "ecosystem.config.js")
