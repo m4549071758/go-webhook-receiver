@@ -25,75 +25,115 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"message": "received push event"})
-
 		go func() {
 
+			log.Println("========================================")
 			log.Println("Received push event")
-			log.Println("Pulling latest code from GitHub")
+			log.Println("========================================")
+
+			log.Println("----------------------------------------")
+			log.Println("STARTING: Pulling latest code from GitHub")
+			log.Println("----------------------------------------")
 			gitCmd := exec.Command("git", "pull")
 			gitCmd.Dir = "/root/blog"
+			gitCmd.Stdout = log.Writer()
+			gitCmd.Stderr = log.Writer()
 			err := gitCmd.Run()
 			if err != nil {
 				log.Println("Failed to pull", err)
 				return
 			}
-			log.Println("Pulled latest code")
+			log.Println("----------------------------------------")
+			log.Println("FINISHED: Pulled latest code")
+			log.Println("----------------------------------------")
 
-			log.Println("Initiating build process")
+			log.Println("----------------------------------------")
+			log.Println("STARTING: Build process")
+			log.Println("----------------------------------------")
 			buildCmd := exec.Command("yarn", "build")
 			buildCmd.Dir = "/root/blog"
+			buildCmd.Stdout = log.Writer()
+			buildCmd.Stderr = log.Writer()
 			err = buildCmd.Run()
 			if err != nil {
 				log.Println("Failed to build", err)
 				return
 			}
-			log.Println("Built latest code")
+			log.Println("----------------------------------------")
+			log.Println("FINISHED: Built latest code")
+			log.Println("----------------------------------------")
 			time.Sleep(10 * time.Second)
 
-			log.Println("Stopping the server")
+			log.Println("----------------------------------------")
+			log.Println("STARTING: Stopping the server")
+			log.Println("----------------------------------------")
 			pm2StopCmd := exec.Command("pm2", "delete", "blog")
 			pm2StopCmd.Dir = "/root/blog"
+			pm2StopCmd.Stdout = log.Writer()
+			pm2StopCmd.Stderr = log.Writer()
 			err = pm2StopCmd.Run()
 			if err != nil {
 				log.Println("Failed to stop", err)
 				return
 			}
-			log.Println("Stopped the server")
+			log.Println("----------------------------------------")
+			log.Println("FINISHED: Stopped the server")
+			log.Println("----------------------------------------")
 			time.Sleep(5 * time.Second)
 
-			log.Println("Fetching articles for sitemap")
+			log.Println("----------------------------------------")
+			log.Println("STARTING: Fetching articles for sitemap")
+			log.Println("----------------------------------------")
 			sitemapCmd := exec.Command("npm", "run", "fetch-articles")
 			sitemapCmd.Dir = "/root/blog"
+			sitemapCmd.Stdout = log.Writer()
+			sitemapCmd.Stderr = log.Writer()
 			err = sitemapCmd.Run()
 			if err != nil {
 				log.Println("Failed to fetch articles for sitemap", err)
 				return
 			}
-			log.Println("Got articles for sitemap")
+			log.Println("----------------------------------------")
+			log.Println("FINISHED: Got articles for sitemap")
+			log.Println("----------------------------------------")
 			time.Sleep(5 * time.Second)
 
-			log.Println("Generating sitemap")
+			log.Println("----------------------------------------")
+			log.Println("STARTING: Generating sitemap")
+			log.Println("----------------------------------------")
 			sitemapGenCmd := exec.Command("npm", "run", "generate-static-files")
 			sitemapGenCmd.Dir = "/root/blog"
+			sitemapGenCmd.Stdout = log.Writer()
+			sitemapGenCmd.Stderr = log.Writer()
 			err = sitemapGenCmd.Run()
 			if err != nil {
 				log.Println("Failed to generate sitemap", err)
 				return
 			}
-			log.Println("Generated sitemap")
+			log.Println("----------------------------------------")
+			log.Println("FINISHED: Generated sitemap")
+			log.Println("----------------------------------------")
 			time.Sleep(5 * time.Second)
 
-			log.Println("Starting the server")
+			log.Println("----------------------------------------")
+			log.Println("STARTING: Starting the server")
+			log.Println("----------------------------------------")
 			pm2Cmd := exec.Command("pm2", "start", "ecosystem.config.js")
 			pm2Cmd.Dir = "/root/blog"
+			pm2Cmd.Stdout = log.Writer()
+			pm2Cmd.Stderr = log.Writer()
 			err = pm2Cmd.Run()
 			if err != nil {
 				log.Println("Failed to start", err)
 				return
 			}
-			log.Println("Started the server")
+			log.Println("----------------------------------------")
+			log.Println("FINISHED: Started the server")
+			log.Println("----------------------------------------")
 
+			log.Println("========================================")
 			log.Println("Deployed successfully")
+			log.Println("========================================")
 		}()
 	})
 
