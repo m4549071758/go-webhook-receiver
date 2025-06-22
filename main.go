@@ -67,17 +67,8 @@ func main() {
 			log.Println("----------------------------------------")
 			log.Println("STARTING: Stopping the server")
 			log.Println("----------------------------------------")
-			pm2StopCmd := exec.Command("pm2", "stop", "blog")
-			pm2StopCmd.Dir = "/root/blog"
-			pm2StopCmd.Stdout = log.Writer()
-			pm2StopCmd.Stderr = log.Writer()
-			err = pm2StopCmd.Run()
-			if err != nil {
-				log.Println("Warning: Failed to stop blog process (might not be running):", err)
-			}
 
-			pm2DeleteCmd := exec.Command("pm2", "delete", "blog")
-			pm2DeleteCmd.Dir = "/root/blog"
+			pm2DeleteCmd := exec.Command("bash", "-c", "cd /root/blog && pm2 delete blog")
 			pm2DeleteCmd.Stdout = log.Writer()
 			pm2DeleteCmd.Stderr = log.Writer()
 			err = pm2DeleteCmd.Run()
@@ -92,8 +83,7 @@ func main() {
 			log.Println("----------------------------------------")
 			log.Println("STARTING: Starting the server")
 			log.Println("----------------------------------------")
-			pm2Cmd := exec.Command("pm2", "start", "ecosystem.config.js")
-			pm2Cmd.Dir = "/root/blog"
+			pm2Cmd := exec.Command("bash", "-c", "cd /root/blog && pm2 start ecosystem.config.js")
 			pm2Cmd.Stdout = log.Writer()
 			pm2Cmd.Stderr = log.Writer()
 			err = pm2Cmd.Run()
